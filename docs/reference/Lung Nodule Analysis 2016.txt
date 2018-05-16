@@ -1,0 +1,56 @@
+(please try to re-format this document as Markdown text)
+
+ZNET - LUNG NODULE DETECTION
+全卷积神经网络:过拟合严重
+recall rate:0.98
+precision:0.000005
+输入大小512x512
+输出大小324x324
+xy平面
+
+batch较小：偏执0.3
+dropout：在卷积层之间使用
+依旧过拟合
+
+解决方式：feature dropout：drop out整个feature
+
+用圈画出结节（至少包含1像素）
+Pixels outside of the segmentation mask after dilation with a 11x11 sphere kernel were assigned a zero weight in this weight map.
+在11x11球体核扩张后的分割掩模之外的像素在该权重图中被赋予零权重。
+
+二值化 +形核（3x3）
+
+平面上candidate很多，在第三维应当接近，欧几里得距离（真实坐标系下毫米单位），过于接近的合并为一个
+和结节过于接近的candidate被移除（<30mm），在结节半径内的被合并
+
+recall：0.95946
+precision：0.00509
+
+剩余卷积神经网络
+输入64x64像素，三视图
+0.5mm一体素
+
+网络结构：
+
+非线性
+
+Data augmentation
+翻转（axes），旋转（degrees），缩放（factor），translation（pixels），高斯噪声（std）
+可以每次全训练在区间中选择一个值
+FROC score 0.902 0.911
+
+learning rate reduction
+learning rate decreased by 90% after epoch（全训练） 80 and epoch 125
+
+预测归一化（prediction equalization）
+对于每个网络，取最高的200个可能性，从所有的可能性中相减得出，然后初一最高的概率
+
+RESULTSANDDISCUSSION
+
+The competition leaderboard score is the average FROC value at false positive rates of 1/8, 1/4, 1/2, 1, 2, 4 and 8 false posi- tives per scan.
+
+We trained a Wide ResNet with N and k values of 5 and 6, and achieved a performance of 0.812 on the competition leaderboard in the nodule detection track. A score of 0.758 was achieved in the false positive reduction track, which in- volves applying the false positive reduction network on a can- didate set provided by the competition organizers.
+
+We think that with a different fusion strategy for the infor- mation in the three slices per candidate this can be improved. For instance, encoding the three orientations in color channels of the input image of the network. Another possible approach is a late fusion architecture with different branches for the in- put orientations.
+
+Also, we feel that the processing of the output of the can- didate selection CNN can be improved. A simple improve- ment could be using 3D connected components instead of 2D connected components on the different slices. This might make the merging by distance step obsolete.（2D到3D）

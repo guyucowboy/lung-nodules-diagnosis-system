@@ -1,0 +1,58 @@
+(please try to re-format this document as Markdown text)
+
+Julian
+预处理
+    重定大小1x1x1mm
+    归一化到0-1 （min-max）
+    同样的方向
+    
+    分离肺部组织，边界信息丢失（最后采用了原始数据）
+    
+标签 （给权重）
+    医生给的标签
+    参赛者的标签
+    非肺部组织边界的随机样本
+    假阳性样本
+    手工正、负样本
+    
+    升采样正样本
+    
+C3D 三维卷积神经网络
+感受野 32x32x32mm
+
+奇怪的组织（与本次无关）
+cancer （与本次无关）
+
+Daniel Hammack
+归一化大小
+10%正样本 90%负样本训练 不正常区域检测
+1~50个不正常区域，多余50则挑最不正常的
+不正常区域指预测值高于某个阈值（他们取了1，不过因为没有实际意义，所以很难说1是什么）
+
+branching the model earlier produced better results when training with multiple objectives
+random 3D transformations of the input
+
+apply several transformations per input and average the results
+
+3D CNN models
+original input is downsampled and fed into each layer of the model, not just the first
+softplus activation is used because the targets for the model were non-negative (we also used scaled sigmoid in some models)
+most models were trained with a MSE objective but some were trained with MAE and some with log loss
+
+filter size 3x3x3
+pooling 2x2x2 with stride 2
+batch normalizarion is used after each convolution and max pooling is used for downsampling after batch norm
+
+1200个正样本
+lossless and lossy augmentation
+random rotation 90 degrees
+random transposition
+random zooming
+random reordering of axes
+random arbitrary rotation by small degrees
+
+lossy 费时 （未使用）
+rebuild different versions of the training set
+reload with a newly augmented version after every few epochs
+
+训练方法
